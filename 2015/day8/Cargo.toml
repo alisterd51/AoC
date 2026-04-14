@@ -1,0 +1,10 @@
+[package]
+name = "day8"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+regex.workspace = true
+
+[lints]
+workspace = true

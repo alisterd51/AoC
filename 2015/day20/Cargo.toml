@@ -1,0 +1,9 @@
+[package]
+name = "day20"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+
+[lints]
+workspace = true
