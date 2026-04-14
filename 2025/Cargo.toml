@@ -1,0 +1,24 @@
+[workspace]
+resolver = "3"
+package.version = "0.1.0"
+package.edition = "2024"
+members = ["day1", "day10", "day11", "day2", "day3", "day4", "day5", "day6", "day7", "day8", "day9"]
+
+[workspace.dependencies]
+
+[workspace.lints.rust]
+warnings = "deny"
+unsafe_code = "forbid"
+
+[workspace.lints.clippy]
+all = "deny"
+pedantic = "deny"
+# from clippy::restriction
+unwrap_used = "deny"
+expect_used = "deny"
+
+[profile.release]
+panic = "abort"
+codegen-units = 1
+lto = true
+strip = true
