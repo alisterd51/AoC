@@ -1,0 +1,10 @@
+[package]
+name = "day4"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+md5 = "0.8"
+
+[lints]
+workspace = true
