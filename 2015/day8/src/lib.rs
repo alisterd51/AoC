@@ -19,12 +19,13 @@ pub fn solve_part_1(lines: &[String]) -> usize {
     let re = Regex::new(r#"\\x[0-9a-fA-F]{2}|\\"|\\\\"#).unwrap();
 
     for line in lines {
-        let mut parsed_line = line.as_str();
-        if let Some(line) = line.strip_prefix(r#"""#)
+        let parsed_line = if let Some(line) = line.strip_prefix(r#"""#)
             && let Some(line) = line.strip_suffix(r#"""#)
         {
-            parsed_line = line;
-        }
+            line
+        } else {
+            line.as_str()
+        };
         let parsed_line = re.replace_all(parsed_line, |caps: &regex::Captures| {
             let correspondance = &caps[0];
 

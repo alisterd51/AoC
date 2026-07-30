@@ -109,7 +109,7 @@ fn is_valid_tile(
     border_tiles.contains(tile) || is_inside(vertical_segments, tile)
 }
 
-fn get_min_max(rectangle: &(Coord, Coord)) -> (Coord, Coord) {
+const fn get_min_max(rectangle: &(Coord, Coord)) -> (Coord, Coord) {
     let (min_x, max_x) = if rectangle.0.x <= rectangle.1.x {
         (rectangle.0.x, rectangle.1.x)
     } else {

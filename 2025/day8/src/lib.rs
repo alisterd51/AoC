@@ -55,9 +55,13 @@ fn create_shortest_junction(
             if junctions.contains(&(index, other_index)) {
                 continue;
             }
-            let distance = (coord.x as f64 - other_coord.x as f64).powi(2)
-                + (coord.y as f64 - other_coord.y as f64).powi(2)
-                + (coord.z as f64 - other_coord.z as f64).powi(2);
+            let distance = (coord.z as f64 - other_coord.z as f64).mul_add(
+                coord.z as f64 - other_coord.z as f64,
+                (coord.x as f64 - other_coord.x as f64).mul_add(
+                    coord.x as f64 - other_coord.x as f64,
+                    (coord.y as f64 - other_coord.y as f64).powi(2),
+                ),
+            );
             match shortest_junction {
                 Some((_, _, shortest_distance)) => {
                     if distance < shortest_distance {
@@ -114,11 +118,9 @@ pub fn solve_part_2(coords: &[Coord]) -> u64 {
         junctions.push(junction);
     }
 
-    let mut result = 0;
-    if let Some(last_junction) = junctions.last() {
-        result = coords[last_junction.0].x * coords[last_junction.1].x;
-    }
-    result
+    junctions.last().map_or(0, |last_junction| {
+        coords[last_junction.0].x * coords[last_junction.1].x
+    })
 }
 
 #[cfg(test)]

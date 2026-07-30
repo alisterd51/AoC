@@ -42,10 +42,7 @@ pub fn parse_ingredients(input: &str) -> Vec<Ingredient> {
 pub fn solve_part_1(ingredients: &[Ingredient]) -> i64 {
     let mut max_score = 0;
 
-    for combination in (0..ingredients.len())
-        .map(|_| 0..=100)
-        .multi_cartesian_product()
-    {
+    for combination in std::iter::repeat_n(0..=100, ingredients.len()).multi_cartesian_product() {
         if combination.iter().sum::<i64>() == 100 {
             let mut sum = Ingredient {
                 capacity: 0,
@@ -78,10 +75,7 @@ pub fn solve_part_1(ingredients: &[Ingredient]) -> i64 {
 pub fn solve_part_2(ingredients: &[Ingredient]) -> i64 {
     let mut max_score = 0;
 
-    for combination in (0..ingredients.len())
-        .map(|_| 0..=100)
-        .multi_cartesian_product()
-    {
+    for combination in std::iter::repeat_n(0..=100, ingredients.len()).multi_cartesian_product() {
         if combination.iter().sum::<i64>() == 100 {
             let mut sum = Ingredient {
                 capacity: 0,

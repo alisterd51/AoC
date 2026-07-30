@@ -20,11 +20,8 @@ pub struct Operator {
 }
 
 fn parse_wire(wire: &str) -> Wire {
-    if let Ok(value) = wire.parse::<u16>() {
-        Wire::Int(value)
-    } else {
-        Wire::Index(wire.to_string())
-    }
+    wire.parse::<u16>()
+        .map_or_else(|_| Wire::Index(wire.to_string()), Wire::Int)
 }
 
 #[must_use]

@@ -226,14 +226,11 @@ fn solve(buttons: &[Vec<usize>], c: &[u64], r: u64) -> Option<Vec<u64>> {
     let free_indices: Vec<usize> = is_free_var
         .iter()
         .enumerate()
-        .filter_map(|(i, &is_free)| if is_free { Some(i) } else { None })
+        .filter_map(|(i, &is_free)| is_free.then_some(i))
         .collect();
     let mut result_x = vec![0.0f64; m_buttons];
-    if solve_free_vars(0, &free_indices, &matrix, &pivot_cols, &mut result_x, r) {
-        Some(result_x.iter().map(|&x| x.round() as u64).collect())
-    } else {
-        None
-    }
+    solve_free_vars(0, &free_indices, &matrix, &pivot_cols, &mut result_x, r)
+        .then(|| result_x.iter().map(|&x| x.round() as u64).collect())
 }
 
 fn solve_free_vars(
@@ -257,7 +254,7 @@ fn solve_free_vars(
                 let mut sum = 0.0;
                 let constant = matrix[r][matrix[0].len() - 1];
                 for c in (p_col + 1)..x.len() {
-                    sum += matrix[r][c] * x[c];
+                    sum = matrix[r][c].mul_add(x[c], sum);
                 }
                 let val = constant - sum;
                 if val < -1e-5 || (val.round() - val).abs() > 1e-5 {

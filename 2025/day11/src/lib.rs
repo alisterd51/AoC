@@ -18,30 +18,37 @@ impl Graph {
         }
     }
 
-    pub fn add_edge(&mut self, u: &str, v: &str) {
+    pub fn add_edge(&mut self, node: &str, connected_node: &str) {
         self.adjacency_list
-            .entry(u.to_string())
+            .entry(node.to_string())
             .or_default()
-            .push(v.to_string());
-        self.adjacency_list.entry(v.to_string()).or_default();
+            .push(connected_node.to_string());
+        self.adjacency_list
+            .entry(connected_node.to_string())
+            .or_default();
     }
 
     fn optimize(&self) -> FastGraph {
         let mut names = Vec::new();
         let mut indices = HashMap::new();
-        for k in self.adjacency_list.keys() {
-            indices.insert(k.clone(), names.len());
-            names.push(k.clone());
+
+        for key in self.adjacency_list.keys() {
+            indices.insert(key.clone(), names.len());
+            names.push(key.clone());
         }
+
         let mut adj = vec![Vec::new(); names.len()];
-        for (u_str, neighbors) in &self.adjacency_list {
-            let u = indices[u_str];
-            for v_str in neighbors {
-                if let Some(&v) = indices.get(v_str) {
-                    adj[u].push(v);
+
+        for (node, neighbors) in &self.adjacency_list {
+            let node_index = indices[node];
+
+            for neighbor in neighbors {
+                if let Some(&neighbor_indice) = indices.get(neighbor) {
+                    adj[node_index].push(neighbor_indice);
                 }
             }
         }
+
         FastGraph {
             adj,
             names,
@@ -51,31 +58,35 @@ impl Graph {
 
     #[must_use]
     pub fn count_paths_via(&self, start: &str, end: &str, waypoints: Vec<&str>) -> u128 {
-        let g = self.optimize();
+        let graph = self.optimize();
         let mut path_points = Vec::new();
-        if let Some(&id) = g.indices.get(start) {
+
+        if let Some(&id) = graph.indices.get(start) {
             path_points.push(id);
         } else {
             return 0;
         }
-        for wp in waypoints {
-            if let Some(&id) = g.indices.get(wp) {
+        for waypoint in waypoints {
+            if let Some(&id) = graph.indices.get(waypoint) {
                 path_points.push(id);
             } else {
                 return 0;
             }
         }
-        if let Some(&id) = g.indices.get(end) {
+        if let Some(&id) = graph.indices.get(end) {
             path_points.push(id);
         } else {
             return 0;
         }
+
         let mut total_combinations: u128 = 1;
+
         for i in 0..path_points.len() - 1 {
-            let u = path_points[i];
-            let v = path_points[i + 1];
-            let mut memo = vec![None; g.names.len()];
-            let segment_count = g.count_paths_dp(u, v, &mut memo);
+            let current = path_points[i];
+            let target = path_points[i + 1];
+            let mut memo = vec![None; graph.names.len()];
+            let segment_count = graph.count_paths_dp(current, target, &mut memo);
+
             if segment_count == 0 {
                 return 0;
             }
@@ -102,10 +113,12 @@ impl FastGraph {
         }
 
         let mut count: u128 = 0;
+
         for &neighbor in &self.adj[current] {
             count = count.saturating_add(self.count_paths_dp(neighbor, target, memo));
         }
         memo[current] = Some(count);
+
         count
     }
 }
@@ -113,6 +126,7 @@ impl FastGraph {
 #[must_use]
 pub fn parse_graph(input: &str) -> Graph {
     let mut graph = Graph::new();
+
     for line in input.lines() {
         if let Some((node, connected_nodes)) = line.split_once(':') {
             for connected_node in connected_nodes.split_whitespace() {
